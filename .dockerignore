@@ -1,0 +1,16 @@
+.git
+node_modules
+**/node_modules
+dist
+releases
+tests
+docs
+miniprogram
+cloudfunctions
+database
+.env
+.env.*
+*.pem
+*.key
+*.zip
+project.private.config.json

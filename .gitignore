@@ -1,5 +1,9 @@
 node_modules/
-cloudfunctions/*/node_modules/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
 project.private.config.json
 miniprogram/config.local.js
 .DS_Store

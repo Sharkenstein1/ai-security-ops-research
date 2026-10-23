@@ -4,8 +4,8 @@ App({
   globalData: { user: null, cloudReady: false },
 
   onLaunch() {
-    if (wx.cloud && typeof config.envId === 'string' && config.envId.trim()) {
-      wx.cloud.init({ env: config.envId.trim(), traceUser: false });
+    if (wx.cloud && typeof wx.cloud.callContainer === 'function' && config.envId && config.service) {
+      wx.cloud.init({ traceUser: false });
       this.globalData.cloudReady = true;
     }
   },

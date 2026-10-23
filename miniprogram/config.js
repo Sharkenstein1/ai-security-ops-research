@@ -1,5 +1,7 @@
-// 在微信开发者工具中，填入与你的 AppID 绑定的云开发环境 ID。
-// 这里填写环境 ID，不要填写 AppSecret、私钥或其他密钥。
+// 已根据你提供的微信云托管调用示例填写，均为非密钥信息。
+// AppSecret 只在云托管服务的环境变量中设置。
 module.exports = {
-  envId: ''
+  envId: 'prod-d8g8fsidhcdbfc1b3',
+  service: 'express-r6wu',
+  apiPath: '/api/game'
 };

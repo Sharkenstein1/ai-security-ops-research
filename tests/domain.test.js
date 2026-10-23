@@ -2,8 +2,8 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { GameService, userIdFor, INVITE_TTL, LIMITS } = require('../cloudfunctions/gameApi/domain');
-const { makeHandler } = require('../cloudfunctions/gameApi/handler');
+const { GameService, userIdFor, INVITE_TTL, LIMITS } = require('../server/domain');
+const { makeHandler } = require('../server/handler');
 const { MemoryStore } = require('./helpers/memory-store');
 
 async function fixture(options = {}) {
@@ -42,14 +42,13 @@ async function fixture(options = {}) {
 
 function code(expected) { return error => { assert.equal(error.code, expected); return true; }; }
 
-test('微信上下文决定身份；伪造 event 和 payload 中的用户编号无效', async () => {
+test('内部身份决定操作人；伪造 payload 中的用户编号无效', async () => {
   const f = await fixture();
-  const handler = makeHandler(f.service, () => ({ OPENID: 'openid-B' }));
-  const result = await handler({ action: 'saveProfile', OPENID: 'openid-A', payload: { userId: f.users.A, nickname: 'B新昵称' } });
+  const handler = makeHandler(f.service);
+  const result = await handler('saveProfile', f.users.B, { userId: f.users.A, nickname: 'B新昵称' });
   assert.equal(result.data.user.id, f.users.B);
   assert.equal((await f.store.get('users', f.users.A)).nickname, 'A');
-  const noContext = makeHandler(f.service, () => ({}));
-  assert.equal((await noContext({ action: 'login' })).error.code, 'UNAUTHENTICATED');
+  assert.throws(() => userIdFor(''), code('UNAUTHENTICATED'));
 });
 
 test('登录幂等；昵称验证；账号无需手机号或客户端密码', async () => {
@@ -80,6 +79,15 @@ test('邀请码冲突时重新分配，不覆盖已有牌局', async () => {
   assert.equal(first.inviteCode, '0386');
   assert.equal(second.inviteCode, '0387');
   assert.equal((await f.store.get('invite_codes', '0386')).roomId, first.id);
+});
+
+test('同一创建请求的并发重试只消耗一次额度，独立牌局仍受限流保护', async () => {
+  const f = await fixture();
+  const results = await Promise.all(Array.from({ length: 8 }, () => f.create('A', '同一场', 'create_retries')));
+  assert.equal(new Set(results.map(room => room.id)).size, 1);
+  assert.equal((await f.store.get('rate_limits', `${f.users.A}_create`)).count, 1);
+  for (let index = 0; index < 4; index += 1) await f.create('A', `独立${index}`, `unique_create_${index}`);
+  await assert.rejects(f.create('A', '第六场', 'unique_create_six'), code('RATE_LIMITED'));
 });
 
 test('待批准玩家只能读自己的申请状态，不能读玩家名单或历史', async () => {
@@ -276,8 +284,8 @@ test('未预期的云数据库错误不会伪装成空历史或泄露后台内�
   const f = await fixture();
   f.store.listMemberships = async () => { throw new Error('private-database-detail'); };
   const logs = [];
-  const handler = makeHandler(f.service, () => ({ OPENID: 'openid-A' }), { error: (...parts) => logs.push(parts) });
-  const result = await handler({ action: 'listHistory' });
+  const handler = makeHandler(f.service, { error: (...parts) => logs.push(parts) });
+  const result = await handler('listHistory', f.users.A);
   assert.equal(result.ok, false);
   assert.equal(result.error.code, 'SERVER_ERROR');
   assert.ok(!JSON.stringify({ result, logs }).includes('private-database-detail'));

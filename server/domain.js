@@ -1,5 +1,7 @@
 'use strict';
 
+// 积分业务与存储解耦，由云托管 HTTP 服务调用。
+
 const crypto = require('node:crypto');
 
 const LIMITS = Object.freeze({ members: 20, entries: 500, joins: 100, points: 1000000000 });
@@ -141,13 +143,15 @@ class GameService {
   async consumeLimit(userId, scope, limit) {
     const now = this.now();
     const id = `${userId}_${scope}`;
-    await this.store.transaction(async tx => {
-      let state = await tx.get('rate_limits', id);
-      if (!state || now - state.startedAt >= 60000) state = { startedAt: now, count: 0 };
-      requireThat(state.count < limit, 'RATE_LIMITED', '操作较频繁，请一分钟后重试');
-      state.count += 1;
-      await tx.set('rate_limits', id, state);
-    });
+    await this.store.transaction(tx => this.incrementLimit(tx, id, limit, now));
+  }
+
+  async incrementLimit(tx, id, limit, now) {
+    let state = await tx.get('rate_limits', id);
+    if (!state || now - state.startedAt >= 60000) state = { startedAt: now, count: 0 };
+    requireThat(state.count < limit, 'RATE_LIMITED', '操作较频繁，请一分钟后重试');
+    state.count += 1;
+    await tx.set('rate_limits', id, state);
   }
 
   async createRoom(userId, payload) {
@@ -160,7 +164,6 @@ class GameService {
       requireThat(existing.title === title, 'IDEMPOTENCY_CONFLICT', '同一次操作的内容不一致');
       return { room: roomView(existing, userId) };
     }
-    await this.consumeLimit(userId, 'create', 5);
     const now = this.now();
     for (let attempt = 0; attempt < 30; attempt += 1) {
       const code = this.randomCode();
@@ -172,6 +175,8 @@ class GameService {
         }
         const occupied = await tx.get('invite_codes', code);
         if (occupied && occupied.expiresAt > now) return null;
+        // 创建与额度计数一起提交；同一个请求的并发重试只消耗一次额度。
+        await this.incrementLimit(tx, `${userId}_create`, 5, now);
         const room = {
           id, title, ownerId: userId, status: 'open', createdAt: now, closedAt: null,
           inviteCode: code, inviteExpiresAt: now + INVITE_TTL,
