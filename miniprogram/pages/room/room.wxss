@@ -1,0 +1,18 @@
+.room-title { max-width: 520rpx; word-break: break-all; }
+.invite-card { background: #eef3e8; border-color: #e0e9d8; }
+.invite-code { font-size: 68rpx; font-weight: 750; letter-spacing: 12rpx; line-height: 1.3; }
+.overview { background: #235d46; color: #fff; border: none; }
+.overview .label, .overview .muted { color: #bfd2be; }
+.my-metrics { margin-top: 0; }
+.my-metrics .metric { font-size: 34rpx; }
+.segments { background: #f2f5ee; padding: 8rpx; display: flex; border-radius: 18rpx; }
+.segment { flex: 1; text-align: center; padding: 18rpx 8rpx; border-radius: 14rpx; font-size: 26rpx; color: #87917e; }
+.segment.selected { background: #fff; color: #235d46; font-weight: 650; box-shadow: 0 3rpx 10rpx #e2e9db; }
+.member-card { padding-top: 8rpx; padding-bottom: 8rpx; }
+.member-name { max-width: 440rpx; }
+.member-total { text-align: right; max-width: 200rpx; word-break: break-all; }
+.member-result { margin-top: 20rpx; }
+.entry-name { max-width: 430rpx; }
+.point-unit { font-size: 24rpx; font-weight: 400; color: #87917e; }
+.revoke-link { text-align: right; color: #987356; margin-top: 10rpx; }
+.archive-note { text-align: center; font-size: 23rpx; color: #929d89; margin-top: 40rpx; }

@@ -1,0 +1,8 @@
+.hero { padding: 34rpx 12rpx 44rpx; position: relative; overflow: hidden; }
+.hero-title { font-size: 76rpx; font-weight: 750; letter-spacing: -4rpx; line-height: 1.22; position: relative; z-index: 1; }
+.hero .subtitle { position: relative; z-index: 1; }
+.hero-mark { position: absolute; right: -6rpx; top: 50rpx; width: 210rpx; height: 210rpx; line-height: 210rpx; text-align: center; font-size: 100rpx; border: 2rpx solid #dbe5d2; color: #dbe5d2; border-radius: 50%; transform: rotate(12deg); }
+.greeting { font-size: 25rpx; color: #658061; padding: 0 8rpx; }
+.step-mark { font-size: 35rpx; font-weight: 700; color: #bdcbb6; }
+.code-input { letter-spacing: 14rpx; }
+.footer-note { color: #949c8c; font-size: 22rpx; text-align: center; padding: 36rpx 0 0; }

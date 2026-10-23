@@ -1,0 +1,21 @@
+<view class="page">
+  <view class="eyebrow">四位数字 · 一场相聚</view>
+  <view class="title">加入牌局</view>
+  <view wx:if="{{status === 'pending' || status === 'approved'}}" class="card empty">
+    <view class="waiting-symbol">···</view>
+    <view class="card-title">{{status === 'approved' ? '已通过，正在进入' : '等待房主确认'}}</view>
+    <view class="subtitle"><view>邀请码 {{code}}</view><view>通过后会自动进入牌局，当前还无法查看牌局内容。</view></view>
+    <view wx:if="{{error}}" class="notice">{{error}}</view>
+    <button class="secondary spaced" bindtap="checkStatus" disabled="{{busy}}">刷新状态</button>
+    <button class="link spaced" bindtap="cancel" disabled="{{busy}}">取消申请</button>
+  </view>
+  <view wx:else class="card">
+    <view class="notice" wx:if="{{status === 'rejected'}}">申请未通过，或牌局已结束。可以联系房主确认。</view>
+    <view class="notice" wx:if="{{status === 'cancelled'}}">你已取消加入申请。</view>
+    <view class="subtitle">输入房主提供的四位邀请码。</view>
+    <input class="field" type="number" maxlength="4" placeholder="四位邀请码" value="{{code}}" bindinput="onCode" disabled="{{busy}}"/>
+    <view wx:if="{{error}}" class="notice">{{error}}</view>
+    <button class="primary spaced" bindtap="submit" loading="{{busy}}" disabled="{{busy}}">提交加入申请</button>
+  </view>
+  <button class="link spaced" bindtap="goHome">返回首页</button>
+</view>

@@ -1,0 +1,16 @@
+{
+  "name": "points-table-miniprogram",
+  "version": "0.1.0",
+  "private": true,
+  "description": "微信小程序：积分登记、房主确认与个人牌局历史",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "node scripts/check-project.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "miniprogram-compiler": "0.2.3"
+  }
+}

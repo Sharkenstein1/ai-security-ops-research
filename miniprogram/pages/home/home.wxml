@@ -1,0 +1,28 @@
+<view class="page">
+  <view class="hero">
+    <view class="eyebrow">相聚有时 · 记录有据</view>
+    <view class="hero-title"><view>每一分，</view><view>都有记录。</view></view>
+    <view class="subtitle"><view>玩家登记，房主确认。</view><view>把每一场相聚，留在自己的小账本里。</view></view>
+    <view class="hero-mark">分</view>
+  </view>
+  <view wx:if="{{!configured}}" class="notice">服务尚未配置。请先按项目 README 完成云环境设置，再使用微信身份登录。</view>
+  <view wx:if="{{!user || !user.nickname}}" class="card welcome">
+    <view class="card-title">从你的昵称开始</view>
+    <view class="subtitle">使用微信身份建立账号，昵称由你填写。</view>
+    <button class="primary spaced" bindtap="login" loading="{{busy}}" disabled="{{busy || !configured}}">微信登录并设置昵称</button>
+  </view>
+  <view wx:else class="greeting">{{user.nickname}}，今天也记得清清楚楚。</view>
+  <view class="card">
+    <view class="row"><view class="card-title">创建一场牌局</view><text class="step-mark">01</text></view>
+    <view class="subtitle">成为房主，邀请朋友，并确认积分记录。</view>
+    <input class="field" placeholder="例如：周末朋友局" maxlength="30" value="{{title}}" bindinput="onTitle" disabled="{{busy}}"/>
+    <button class="primary" bindtap="createRoom" loading="{{busy}}" disabled="{{busy || !configured}}">创建牌局</button>
+  </view>
+  <view class="card">
+    <view class="row"><view class="card-title">加入朋友的牌局</view><text class="step-mark">02</text></view>
+    <view class="subtitle">输入四位邀请码，等待房主确认加入。</view>
+    <input class="field code-input" placeholder="四位邀请码" type="number" maxlength="4" value="{{code}}" bindinput="onCode" disabled="{{busy}}"/>
+    <button class="secondary" bindtap="joinRoom" disabled="{{busy || !configured}}">申请加入</button>
+  </view>
+  <view class="footer-note">历史牌局仅向该局参与者开放</view>
+</view>

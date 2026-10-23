@@ -1,0 +1,98 @@
+<view class="page">
+  <view wx:if="{{loading && !room}}" class="empty muted">正在读取牌局…</view>
+  <view wx:elif="{{error}}" class="card empty">
+    <view class="card-title">暂时无法打开</view>
+    <view class="subtitle">{{error}}</view>
+    <button class="secondary spaced" bindtap="refresh">重新读取</button>
+    <button class="link spaced" bindtap="goHome">返回首页</button>
+  </view>
+  <block wx:elif="{{room}}">
+    <view class="eyebrow">{{room.isOwner ? '你是本局房主' : '只属于参与者的记录'}}</view>
+    <view class="row"><view class="title room-title">{{room.title}}</view><text class="tag {{room.status}}">{{room.status === 'open' ? '进行中' : '已结束'}}</text></view>
+    <view class="subtitle">{{room.dateLabel}} · {{room.members.length}} 位玩家</view>
+    <view wx:if="{{syncError}}" class="notice">{{syncError}}。当前显示上次成功读取的记录，可下拉刷新。</view>
+    <view wx:if="{{room.isOwner && room.status === 'open'}}" class="card invite-card">
+      <view class="row">
+        <view><view class="label">本局邀请码</view><view class="invite-code">{{room.inviteCode}}</view></view>
+        <button class="secondary small" bindtap="copyCode">复制邀请码</button>
+      </view>
+      <view class="row"><view class="muted">有效至 {{room.inviteExpiryLabel}}</view><button class="link" bindtap="refreshInvite" disabled="{{busy}}">更新</button></view>
+    </view>
+    <view class="card overview">
+      <view class="row"><view class="card-title">本局概览</view><text class="muted">仅统计已确认记录</text></view>
+      <view class="metrics">
+        <view><view class="label">累计投入积分</view><view class="metric">{{room.summary.totalLabel}}</view></view>
+        <view><view class="label">已登记结束积分</view><view class="metric">{{room.summary.endingLabel}}</view></view>
+      </view>
+      <view class="muted spaced" wx:if="{{room.summary.missingFinalCount}}">{{room.summary.missingFinalCount}} 位玩家尚未登记结束积分</view>
+      <view class="muted spaced" wx:else>积分核对差额：{{room.summary.differenceLabel}}</view>
+    </view>
+
+    <block wx:if="{{room.isOwner && room.status === 'open'}}">
+      <view class="section-title" wx:if="{{room.joinRequests.length}}">加入申请 · {{room.joinRequests.length}}</view>
+      <view class="card" wx:for="{{room.joinRequests}}" wx:key="id">
+        <view class="row"><view class="name">{{item.nickname}}</view><text class="tag pending">申请加入</text></view>
+        <view class="actions">
+          <button class="quiet small" data-id="{{item.id}}" data-approve="no" bindtap="decideJoin" disabled="{{busy}}">拒绝</button>
+          <button class="primary small" data-id="{{item.id}}" data-approve="yes" bindtap="decideJoin" disabled="{{busy}}">允许加入</button>
+        </view>
+      </view>
+      <view class="section-title" wx:if="{{room.pendingEntries.length}}">待确认积分 · {{room.pendingEntries.length}}</view>
+      <view class="card" wx:for="{{room.pendingEntries}}" wx:key="id">
+        <view class="row"><view class="name">{{item.nickname}} · {{item.kindLabel}}</view><view class="metric">{{item.pointsLabel}}</view></view>
+        <view class="muted">{{item.timeLabel}}</view>
+        <view class="actions">
+          <button class="quiet small" data-id="{{item.id}}" data-approve="no" bindtap="decidePoints" disabled="{{busy}}">拒绝</button>
+          <button class="primary small" data-id="{{item.id}}" data-approve="yes" bindtap="decidePoints" disabled="{{busy}}">确认积分</button>
+        </view>
+      </view>
+    </block>
+
+    <view class="section-title">我的积分</view>
+    <view class="card">
+      <view class="metrics my-metrics">
+        <view><view class="label">登记次数</view><view class="metric">{{room.self.entryCount}}</view></view>
+        <view><view class="label">累计投入</view><view class="metric">{{room.self.totalLabel}}</view></view>
+        <view><view class="label">积分变化</view><view class="metric {{room.self.netPositive ? 'positive' : ''}}">{{room.self.netLabel}}</view></view>
+      </view>
+      <block wx:if="{{room.status === 'open' && room.self.endingPoints === null}}">
+        <view class="divider"></view>
+        <view class="segments">
+          <view class="segment {{kind === 'add' ? 'selected' : ''}}" data-kind="add" bindtap="changeKind">登记积分</view>
+          <view class="segment {{kind === 'finish' ? 'selected' : ''}}" data-kind="finish" bindtap="changeKind">结束积分</view>
+        </view>
+        <input class="field" type="number" maxlength="10" placeholder="{{kind === 'finish' ? '输入结束时持有的积分，可为 0' : '输入本次增加的积分'}}" value="{{points}}" bindinput="onPoints" disabled="{{busy}}"/>
+        <button class="primary" bindtap="submitPoints" loading="{{busy}}" disabled="{{busy}}">提交给房主确认</button>
+        <view class="muted spaced">{{kind === 'finish' ? '结束积分为可选项。请先处理待确认登记；结束积分确认后将停止追加。' : '每次确认计为一次登记，重复点击不会重复入账。房主自己的记录也需要确认。'}}</view>
+      </block>
+      <view class="muted spaced" wx:elif="{{room.self.endingPoints !== null}}">结束积分 {{room.self.endingLabel}}，已由房主确认。</view>
+    </view>
+
+    <view class="section-title">本局玩家</view>
+    <view class="card member-card">
+      <view class="list-row" wx:for="{{room.members}}" wx:key="userId">
+        <view class="row">
+          <view class="row-start member-name"><view class="avatar">{{item.initial}}</view><view><view class="name">{{item.nickname}} {{item.isMe ? '· 我' : ''}}</view><view class="muted">{{item.isOwner ? '房主 · ' : ''}}{{item.entryCount}} 次登记</view></view></view>
+          <view class="member-total"><view class="name">{{item.totalLabel}}</view><view class="label">累计投入</view></view>
+        </view>
+        <view class="member-result muted">结束积分 {{item.endingLabel}} · 积分变化 {{item.netLabel}}</view>
+      </view>
+    </view>
+
+    <view class="section-title">积分明细 · {{room.entries.length}}</view>
+    <view class="card empty" wx:if="{{!room.entries.length}}"><view class="muted">还没有积分记录，提交第一笔吧。</view></view>
+    <view class="card entry-card" wx:for="{{room.entries}}" wx:key="id">
+      <view class="row"><view class="name entry-name">{{item.nickname}} · {{item.kindLabel}}</view><text class="tag {{item.status}}">{{item.statusLabel}}</text></view>
+      <view class="row spaced"><view class="metric">{{item.pointsLabel}}<text class="point-unit"> 分</text></view><view class="muted">{{item.timeLabel}}</view></view>
+      <view wx:if="{{item.decidedAt}}" class="muted">房主处理：{{item.decidedLabel}}</view>
+      <view class="notice" wx:if="{{item.status === 'revoked'}}">撤销原因：{{item.revokeReason}}<view>{{item.revokedLabel}}</view></view>
+      <button wx:if="{{item.canRevoke}}" class="link revoke-link" data-id="{{item.id}}" bindtap="revoke" disabled="{{busy}}">撤销此记录</button>
+    </view>
+    <view wx:if="{{room.isOwner && room.status === 'open'}}" class="card">
+      <view class="card-title">结束并归档</view>
+      <view class="subtitle">处理完所有待确认积分后即可结束。结束后记录保留，邀请码失效，所有记录停止修改。</view>
+      <button class="danger spaced" bindtap="closeRoom" disabled="{{busy}}">结束本局</button>
+    </view>
+    <view wx:if="{{room.status === 'closed'}}" class="archive-note">本局已于 {{room.closedLabel}} 归档</view>
+  </block>
+</view>

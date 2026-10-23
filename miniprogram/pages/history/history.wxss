@@ -1,0 +1,6 @@
+.history-title { max-width: 460rpx; word-break: break-all; }
+.history-metrics { margin-top: 0; align-items: center; }
+.history-metrics .metric { font-size: 36rpx; }
+.history-metrics > .history-arrow { flex: 0; width: 46rpx; color: #64895a; font-size: 40rpx; }
+.history-end { text-align: center; color: #929d89; font-size: 23rpx; margin-top: 32rpx; }
+.card-pressed { background: #f0f4e9; }

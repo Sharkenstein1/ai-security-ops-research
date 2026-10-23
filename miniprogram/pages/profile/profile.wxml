@@ -1,0 +1,25 @@
+<view class="page">
+  <view class="eyebrow">你的身份 · 你的记录</view>
+  <view class="title">我的</view>
+  <view wx:if="{{error}}" class="card empty">
+    <view class="subtitle">{{error}}</view>
+    <button class="secondary spaced" bindtap="load">重新连接</button>
+  </view>
+  <block wx:else>
+    <view class="card">
+      <view class="profile-avatar">{{initial}}</view>
+      <view class="card-title">{{user.nickname || '给自己起个昵称'}}</view>
+      <view class="subtitle">账号与当前微信身份关联。再次进入时，你的牌局记录依然在这里。</view>
+      <input class="field" placeholder="你在牌局里的昵称" maxlength="20" value="{{nickname}}" bindinput="onNickname" disabled="{{busy}}"/>
+      <button class="primary" bindtap="save" loading="{{busy}}" disabled="{{busy || !user}}">保存昵称</button>
+      <button class="link spaced" bindtap="goHome">回到首页，开始记录 →</button>
+    </view>
+    <view class="card">
+      <view class="card-title">记录规则</view>
+      <view class="rule">01　积分登记须经房主确认才计入统计。</view>
+      <view class="rule">02　每场牌局仅向该局参与者开放。</view>
+      <view class="rule">03　结束积分为可选记录，确认后可计算积分变化。</view>
+      <view class="rule">04　修改昵称对之后加入的牌局生效，历史昵称会保留。</view>
+    </view>
+  </block>
+</view>

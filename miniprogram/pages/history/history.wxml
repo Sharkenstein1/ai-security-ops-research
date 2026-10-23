@@ -1,0 +1,25 @@
+<view class="page">
+  <view class="eyebrow">每一次相聚 · 都有迹可循</view>
+  <view class="title">我的牌局</view>
+  <view class="subtitle">只显示你已加入的牌局，进行中和已结束的记录都会保留。</view>
+  <view wx:if="{{error}}" class="notice">{{error}}<button class="link" bindtap="load">重试</button></view>
+  <view wx:if="{{!loading && !error && !items.length}}" class="card empty">
+    <view class="empty-symbol">◎</view>
+    <view class="card-title">第一场，等你开始</view>
+    <view class="subtitle">创建牌局，或通过朋友的邀请码加入。<view>房主确认加入后，记录就会出现在这里。</view></view>
+    <button class="secondary spaced" bindtap="goHome">去首页看看</button>
+  </view>
+  <view class="card history-card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="openRoom" hover-class="card-pressed">
+    <view class="row"><view class="card-title history-title">{{item.title}}</view><text class="tag {{item.status}}">{{item.status === 'open' ? '进行中' : '已结束'}}</text></view>
+    <view class="muted spaced">{{item.dateLabel}} · {{item.memberCount}} 位玩家 {{item.isOwner ? '· 我是房主' : ''}}</view>
+    <view class="divider"></view>
+    <view class="metrics history-metrics">
+      <view><view class="label">我的累计投入</view><view class="metric">{{item.totalLabel}}</view></view>
+      <view><view class="label">我的积分变化</view><view class="metric {{item.netPositive ? 'positive' : ''}}">{{item.netLabel}}</view></view>
+      <view class="history-arrow">↗</view>
+    </view>
+  </view>
+  <view wx:if="{{loading}}" class="empty muted">正在读取记录…</view>
+  <button wx:elif="{{hasMore}}" class="link spaced" bindtap="loadMore">加载更多</button>
+  <view wx:elif="{{items.length}}" class="history-end">已显示全部牌局</view>
+</view>

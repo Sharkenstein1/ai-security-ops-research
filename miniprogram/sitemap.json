@@ -1,0 +1,4 @@
+{
+  "desc": "私人记录页面不参与微信搜索索引",
+  "rules": [{ "action": "disallow", "page": "*" }]
+}

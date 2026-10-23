@@ -1,0 +1,15 @@
+{
+  "collections": ["users", "rooms", "invite_codes", "memberships", "rate_limits"],
+  "indexes": [
+    {
+      "collection": "memberships",
+      "name": "user_history",
+      "unique": false,
+      "fields": [
+        { "name": "userId", "direction": "asc" },
+        { "name": "joinedAt", "direction": "desc" }
+      ]
+    }
+  ],
+  "note": "在云开发控制台创建集合，并给每个集合设置 security.rules.json 中的自定义安全规则。索引在控制台按上述字段创建；本文件不会自动创建集合或索引。"
+}

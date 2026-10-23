@@ -1,0 +1,16 @@
+{
+  "appid": "touristappid",
+  "projectname": "积分小账本",
+  "description": "积分登记与个人牌局记录",
+  "miniprogramRoot": "miniprogram/",
+  "cloudfunctionRoot": "cloudfunctions/",
+  "compileType": "miniprogram",
+  "libVersion": "3.7.0",
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "urlCheck": true
+  }
+}

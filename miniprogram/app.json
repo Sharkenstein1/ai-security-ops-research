@@ -1,0 +1,29 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/history/history",
+    "pages/profile/profile",
+    "pages/join/join",
+    "pages/room/room"
+  ],
+  "window": {
+    "navigationBarTitleText": "积分小账本",
+    "navigationBarBackgroundColor": "#f7f8f2",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f7f8f2",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#7c847c",
+    "selectedColor": "#235d46",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/home/home", "text": "首页" },
+      { "pagePath": "pages/history/history", "text": "我的牌局" },
+      { "pagePath": "pages/profile/profile", "text": "我的" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
