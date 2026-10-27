@@ -2,6 +2,8 @@
 
 原生微信小程序 + Express + MySQL。当前版本已适配你开通的云托管服务，前端通过 `wx.cloud.callContainer` 调用后端。
 
+在其他会话接续本项目，请先阅读[跨会话交接文档](docs/HANDOFF.md)，其中包含版本基准、已验证内容和待部署事项。
+
 | 配置 | 已填写的值 |
 | --- | --- |
 | 云托管环境 | `prod-d8g8fsidhcdbfc1b3` |
